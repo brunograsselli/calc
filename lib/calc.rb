@@ -1,9 +1,14 @@
+require "rubygems"
+require "redis"
+
 class Calculator
-  PATH = "/home/bruno/projects/calc/"
+  REDIS_KEY = "calc:start_time"
 
   def initialize(time_as_string)
+    @redis = Redis.new
+
     if time_as_string.nil?
-      time_as_string = File.read(PATH + 'data/time').chomp
+      time_as_string = @redis.get(REDIS_KEY) || "09:00"
     else
       save! time_as_string
     end
@@ -13,13 +18,23 @@ class Calculator
   end
   
   def to_s
-    "#{@initial_time.strftime "%H:%M"}: #{@minimum_time.strftime "%H:%M"} - #{@time.strftime "%H:%M"} - #{@maximum_time.strftime "%H:%M"}"
+    line_bar = "+------------------------------------+"
+    header   = "| Chegada | Minimo | Normal | Maximo |"
+    mid_bar  = "+---------+--------+--------+--------+"
+
+    init_time_str = @initial_time.strftime "%H:%M"
+    min_time_str = @minimum_time.strftime "%H:%M"
+    normal_time_str = @time.strftime "%H:%M"
+    max_time_str = @maximum_time.strftime "%H:%M"
+    time_line = "| #{init_time_str}   | #{min_time_str}  | #{normal_time_str}  | #{max_time_str}  |"
+
+    "#{line_bar}\n#{header}\n#{mid_bar}\n#{time_line}\n#{line_bar}\n"
   end
 
   private
 
   def save!(time)
-    File.open(PATH + 'data/time', 'w') {|f| f.puts time}
+    @redis.set REDIS_KEY, time
   end
 
   def calc!
