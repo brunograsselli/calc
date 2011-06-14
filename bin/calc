@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
 
-require "/home/bruno/projects/calc/lib/calc"
+require "lib/calc"
 
 puts Calculator.new(ARGV[0])
