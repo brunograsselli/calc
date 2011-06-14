@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
 
-require "lib/calc"
+file = File.symlink?(__FILE__) ? File.readlink(__FILE__) : __FILE__
+require File.expand_path(File.dirname(file) + "/../lib/calc")
 
 puts Calculator.new(ARGV[0])
